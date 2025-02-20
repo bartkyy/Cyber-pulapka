@@ -24,6 +24,16 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        PlayerPositionSaver positionSaver = FindFirstObjectByType<PlayerPositionSaver>();
+        if (positionSaver != null)
+        {
+            transform.position = positionSaver.GetStartPosition();
+        }
+    }
+
+
     private void Update()
     {
         if (!isMoving)
