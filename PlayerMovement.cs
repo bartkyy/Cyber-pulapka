@@ -9,30 +9,19 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 input;
     private Coroutine moveCoroutine;
     private Animator animator;
-    [SerializeField] public LayerMask solidObjectsLayer; // Warstwa obiektów kolizyjnych
+    [SerializeField] public LayerMask objects; // Warstwa obiektów kolizyjnych
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
 
-        // Odczytujemy zapisaną pozycję gracza po zmianie sceny
-        if (PlayerPrefs.HasKey("PlayerX") && PlayerPrefs.HasKey("PlayerY"))
+        // Pobieramy zapisane pozycje lub domyślne startowe pozycje dla danej sceny
+        PlayerPositionSaver playerSaver = Object.FindFirstObjectByType<PlayerPositionSaver>();
+        if (playerSaver != null)
         {
-            float x = PlayerPrefs.GetFloat("PlayerX");
-            float y = PlayerPrefs.GetFloat("PlayerY");
-            transform.position = new Vector2(x, y);
+            transform.position = playerSaver.LoadPosition(SceneManager.GetActiveScene().name);
         }
     }
-
-    private void Start()
-    {
-        PlayerPositionSaver positionSaver = FindFirstObjectByType<PlayerPositionSaver>();
-        if (positionSaver != null)
-        {
-            transform.position = positionSaver.GetStartPosition();
-        }
-    }
-
 
     private void Update()
     {
@@ -98,7 +87,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsWalkable(Vector3 targetPos)
     {
-        return Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer) == null;
+        return Physics2D.OverlapCircle(targetPos, 0.2f, objects) == null;
     }
 
     // Zapisujemy pozycję gracza przed zmianą sceny
